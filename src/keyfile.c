@@ -92,6 +92,8 @@ static gint session_notebook_page;
 static gint hpan_position;
 static gint vpan_position;
 static const gchar atomic_file_saving_key[] = "use_atomic_file_saving";
+static const gchar search_always_wrap_key[] = "pref_main_search_always_wrap";
+static const gchar search_hide_find_dialog_key[] = "pref_main_search_hide_find_dialog";
 
 static GPtrArray *keyfile_groups = NULL;
 
@@ -150,8 +152,10 @@ static void init_pref_groups(void)
 	stash_group_add_toggle_button(group, &interface_prefs.highlighting_invert_all,
 		"highlighting_invert_all", FALSE, "check_highlighting_invert");
 
-	stash_group_add_toggle_button(group, &search_prefs.suppress_dialogs,
-		"pref_main_suppress_search_dialogs", FALSE, "check_ask_suppress_search_dialogs");
+	stash_group_add_toggle_button(group, &search_prefs.always_wrap,
+		search_always_wrap_key, FALSE, "check_always_wrap_search");
+	stash_group_add_toggle_button(group, &search_prefs.hide_find_dialog,
+		search_hide_find_dialog_key, FALSE, "check_hide_find_dialog");
 	stash_group_add_toggle_button(group, &search_prefs.use_current_word,
 		"pref_main_search_use_current_word", TRUE, "check_search_use_current_word");
 
@@ -691,6 +695,17 @@ static void load_dialog_prefs(GKeyFile *config)
 	{
 		g_key_file_set_boolean(config, PACKAGE, atomic_file_saving_key,
 			utils_get_setting_boolean(config, PACKAGE, "use_safe_file_saving", FALSE));
+	}
+
+	/* compatibility with Geany 0.21 */
+	{
+		gboolean suppress_search_dialogs = utils_get_setting_boolean(config, PACKAGE, "pref_main_suppress_search_dialogs", FALSE);
+
+		if (!g_key_file_has_key(config, PACKAGE, search_always_wrap_key, NULL))
+			g_key_file_set_boolean(config, PACKAGE, search_always_wrap_key, suppress_search_dialogs);
+
+		if (!g_key_file_has_key(config, PACKAGE, search_hide_find_dialog_key, NULL))
+			g_key_file_set_boolean(config, PACKAGE, search_hide_find_dialog_key, suppress_search_dialogs);
 	}
 
 	/* read stash prefs */

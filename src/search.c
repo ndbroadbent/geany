@@ -1253,9 +1253,7 @@ on_find_dialog_response(GtkDialog *dialog, gint response, gpointer user_data)
 				gint result = document_find_text(doc, search_data.text, search_data.original_text, search_data.flags,
 					(response == GEANY_RESPONSE_FIND_PREVIOUS), TRUE, GTK_WIDGET(find_dlg.dialog));
 				ui_set_search_entry_background(find_dlg.entry, (result > -1));
-				check_close = FALSE;
-				if (search_prefs.suppress_dialogs)
-					check_close = TRUE;
+				check_close = search_prefs.hide_find_dialog;
 				break;
 			}
 			case GEANY_RESPONSE_FIND_IN_FILE:
